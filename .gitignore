@@ -1,0 +1,57 @@
+# ==================== uv / Python 环境 ====================
+.venv/
+.uv/
+.python-version
+# uv.lock 建议提交以锁定依赖（保证可复现），如需忽略则取消下行注释
+# uv.lock
+
+# ==================== Python 通用 ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.installed.cfg
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+venv/
+env/
+
+# ==================== IDE ====================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.pycharm/
+
+# ==================== 操作系统 ====================
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ==================== 实验数据（大体积 / 可由脚本重新生成） ====================
+# EEG 原始数据与中间文件（BrainVision / EGI / 通用格式）
+*.vhdr
+*.eeg
+*.vmrk
+*.mff
+*.raw
+*.set
+*.fdt
+*.edf
+*.bdf
+*.cnt
+
+# 预处理 / 对齐输出（BIDS 数据集、嵌入等）
+data_preprocessing_and_alignment/derivatives/
+data/embeddings/
+*.log

@@ -35,10 +35,9 @@ pip install transformers
 1. **文件开头应包含以** **`Ch0`** **标记的前言部分**。前言将作为正式章节阅读前的模拟（练习）。
 2. 后续每个章节应以 **`Ch + <章节号>`** 标记开头。
 
-示例如下：
+示例如下（文件名为 `Chinese_novel.txt`）：
 
 ```
-Chinese_novel.txt
 Ch0
 This is the preface of the novel
 Ch1

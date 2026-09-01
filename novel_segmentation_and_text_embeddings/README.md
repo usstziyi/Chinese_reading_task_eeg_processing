@@ -35,10 +35,9 @@ You should run `cut_Chinese_novel.py` to process your `.txt` formated Chinese no
 1. **The beginning of the file should contain the preface section with a sign Ch0**. The preface will be used as a simulation before reading the formal chapters.
 2. Each subsequent chapter should start with a sign **Ch + \<chapter number>**.
 
-Below is an example:
+Below is an example (the file name is `Chinese_novel.txt`):
 
 ```
-Chinese_novel.txt
 Ch0
 This is the preface of the novel
 Ch1

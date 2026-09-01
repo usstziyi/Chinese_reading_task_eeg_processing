@@ -56,10 +56,9 @@ Tobii Pro Glasses 3 是先进的穿戴式眼动仪。它能够捕获真实世界
 
 ### 实验材料准备
 
-此步骤主要涉及准备实验所需的文本阅读材料。你需要首先将材料转换为下面所示的特定格式：
+此步骤主要涉及准备实验所需的文本阅读材料。你需要首先将材料转换为下面所示的特定格式（文件名为 `Chinese_novel.txt`）：
 
 ```
-Chinese_novel.txt
 Ch0
 This is the preface of the novel
 Ch1

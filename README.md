@@ -56,10 +56,9 @@ If you choose to use Docker, you can refer to the detailed tutorial provided [he
 
 ### Experiment Materials Preparation
 
-This step primarily involves preparing the textual reading materials needed for the experiment. You need to first convert your materials into the specific format below:
+This step primarily involves preparing the textual reading materials needed for the experiment. You need to first convert your materials into the specific format below (the file is named `Chinese_novel.txt`):
 
 ```
-Chinese_novel.txt
 Ch0
 This is the preface of the novel
 Ch1
