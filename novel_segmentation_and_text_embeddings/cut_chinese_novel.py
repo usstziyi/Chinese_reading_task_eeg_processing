@@ -9,25 +9,6 @@ Author: Jianyu Zhang, Xinyu Mou
 This is used for novel segmentation and format transformation for the Chinese novel you want to play.
 '''
 
-def delete_specific_element(str, element):
-    """Remove specific elements from a string"""
-    segments = re.split(element, str)
-    segments = list(filter(lambda x:x != element, segments))
-    result = ''.join(segments)
-
-    return result
-
-def contain_leading_quotation(sentence):
-    if '“' in sentence:
-        return True
-    return False
-
-def contain_back_quotation(sentence):
-    if '”' in sentence:
-        return True
-    return False
-
-
 def merge_short_sentences(segments):
     """Concatenate overly short, split sentences in a sentence"""
     results = []
@@ -64,48 +45,34 @@ def calculate_length_without_punctuation_and_indexes(sentence):
 
 def cut_paragraph(paragraph):
     """Split the article into complete sentences"""
-    # First split the entire sentence
-    sentences = re.split(r"(。|！|？|”|；)", paragraph)
-    # Piece together the separate punctuation marks.
-    sentences = [''.join(i) for i in zip(sentences[0::2], sentences[1::2])]
+    # Split by sentence-ending punctuation; keep each punctuation with its
+    # sentence and merge consecutive punctuation (e.g. ？”) into the ending.
+    sentences = re.findall(r"[^。！？”；]+[。！？”；]*", paragraph)
 
-    # Move the punctuation to the right place
-    for i in range(len(sentences)):
-        if sentences[i][0] in ['。', '！', '？', '”', '；']:
-            sentences[i - 1] += sentences[i][0]
-            sentences[i] = sentences[i][1:]
+    # Clean whitespace: strip ends (covers full-width space '\u3000', '\t',
+    # '\r', '\xa0'), then remove any internal '\n' and half-width ' '.
+    sentences = [s.strip().replace('\n', '').replace(' ', '') for s in sentences]
+    # Drop empty str
+    sentences = [s for s in sentences if s]
 
-    # Remove empty str
-    sentences = list(filter(lambda x:x != '', sentences))
-    sentences = [i.strip() for i in sentences]
-
-    # Remove \n in str
-    sentences = [delete_specific_element(i, '\n') for i in sentences]
-
-    # Remove space in str
-    sentences = [delete_specific_element(i, ' ') for i in sentences]
-
-    # Reassemble the double quotes that are not in the same string together
+    # Reassemble quotes that were split across sentences
     results = []
-    isOneSentence = False
-    for i in range(len(sentences)):
-        # Both having the opening quotation mark and the closing quotation mark
-        if contain_leading_quotation(sentences[i]) and contain_back_quotation(sentences[i]):
-            results.append(sentences[i])
-        # Only having opening quotation mark. Subsequent sentence should be added
-        elif contain_leading_quotation(sentences[i]) and not contain_back_quotation(sentences[i]):
-            results.append(sentences[i])
-            isOneSentence = True
-        # Only having closing quotation mark. Adding is finished
-        elif contain_back_quotation(sentences[i]):
-            results[-1] += sentences[i]
-            isOneSentence = False
-        # No quotation, but surrounded by quotations
-        elif isOneSentence == True:
-            results[-1] += sentences[i]
-        # No quotation, and not surrounded by quotations
-        else:
-            results.append(sentences[i])
+    in_quote = False
+    for s in sentences:
+        has_open, has_close = '“' in s, '”' in s
+        if has_open and not has_close:          # quote opens here
+            results.append(s)
+            in_quote = True
+        elif has_close and not has_open:        # quote closes here
+            if results:
+                results[-1] += s
+            else:
+                results.append(s)
+            in_quote = False
+        elif in_quote:                          # inside a quote, keep merging
+            results[-1] += s
+        else:                                   # ordinary sentence
+            results.append(s)
 
     return results
 

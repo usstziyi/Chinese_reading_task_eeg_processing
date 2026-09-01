@@ -55,3 +55,6 @@ Desktop.ini
 data_preprocessing_and_alignment/derivatives/
 data/embeddings/
 *.log
+
+
+test.py
