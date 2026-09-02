@@ -178,49 +178,29 @@ def split_row(sentences):
 def split_preface_main_content(sentences, divide_nums):
     """Separate the preface section and divide the main text into a specified number
     of parts according to the chapters."""
-    # def get_breakpoints(n, m):
-    #     if m <= 1 or n <= 0:
-    #         return []
-
-    #     breakpoints = []
-    #     interval = n // m + 1
-    #     for i in range(1, m):
-    #         breakpoint_value = i * interval
-    #         breakpoints.append(breakpoint_value)
-
-    #     return breakpoints
-
-
-    if '1' in sentences:
+    # Locate the first chapter marker '1'; without it, everything is preface.
+    try:
         first_chapter_index = sentences.index('1')
-
-    else:
+    except ValueError:
         first_chapter_index = len(sentences)
 
-    preface = sentences[:first_chapter_index]
-    preface = preface[1:]   # Remove the mark 0 at the beginning
-
+    preface = sentences[1:first_chapter_index]   # Drop the leading mark '0'
     main_content = sentences[first_chapter_index:]
 
-
+    # Count consecutive chapters (1, 2, 3, ...) present in the main content.
     max_chapter = 0
-    while str(round(max_chapter+1)) in main_content:
+    while str(max_chapter + 1) in main_content:
         max_chapter += 1
 
+    # Each breakpoint n ends the current part at chapter n, i.e. cuts right
+    # before chapter n+1. Drop breakpoints whose next chapter does not exist.
+    cut_chapter = [n for n in divide_nums if n + 1 <= max_chapter]
+    cut_indexes = [main_content.index(str(n + 1)) for n in cut_chapter]
+    cut_indexes.append(len(main_content))
 
-    cut_chapter = divide_nums
-    for i in range(len(divide_nums)):
-        if cut_chapter[i] + 1 > max_chapter:
-            cut_chapter.pop(i)
-    cut_indexes_last = [main_content.index(str(round(i+1))) for i in cut_chapter]
-    cut_indexes_last.append(len(main_content)+1)
-
-
-    main_content_parts = []
-    cut_index_first = 0
-    for i in cut_indexes_last:
-        main_content_parts.append(main_content[cut_index_first:i])
-        cut_index_first = i
+    # Slice the main content into parts between consecutive cut positions.
+    bounds = [0] + cut_indexes
+    main_content_parts = [main_content[start:end] for start, end in zip(bounds, bounds[1:])]
 
     return preface, main_content_parts
 
@@ -230,55 +210,38 @@ def split_preface_main_content(sentences, divide_nums):
 def arrange_sentences_in_psychopy_requirement(sentences):
     """The line that needs to be highlighted is in the middle,
     with one line above and one below it as background"""
-    results = []
-    indexes = []
-    main_row = []
-    row_num = []
-    for i in range(len(sentences)):
-        if i == 0 and sentences[i] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
-            length_without_puntuation, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(
-                sentences[i])
-            for k in range(length_without_puntuation):
-                results.append(sentences[i] + '\n' + sentences[i + 1])
-                indexes.append(indexes_of_non_punc[k])
-                main_row.append(0)
-                row_num.append(2)
-        elif i == len(sentences) - 1:
-            length_without_puntuation, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(
-                sentences[i])
-            for k in range(length_without_puntuation):
-                results.append(sentences[i-1] + '\n' + sentences[i])
-                indexes.append(indexes_of_non_punc[k])
-                main_row.append(1)
-                row_num.append(2)
-        elif sentences[i] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
-            results.append(sentences[i])
+    
+    results = []     # 存储最终生成的每个帧的文本内容
+    indexes = []     # 存储每帧中高亮字符在其所属行中的索引位置
+    main_row = []     # 存储每帧中高亮行对应的行号（0表示无高亮）
+    row_num = []     # 存储每帧的总行数
+    n = len(sentences)
+    for i, cur in enumerate(sentences):
+        # Chapter-number markers are displayed alone, without highlighting.
+        if cur in CHAPTER_MARKS:
+            results.append(cur)
             indexes.append(0)
             main_row.append(0)
             row_num.append(1)
-        elif sentences[i-1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
-            length_without_puntuation, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(sentences[i])
-            for k in range(length_without_puntuation):
-                results.append(sentences[i] + '\n' + sentences[i+1])
-                indexes.append(indexes_of_non_punc[k])
-                main_row.append(0)
-                row_num.append(2)
-        elif sentences[i+1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
-            length_without_puntuation, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(
-                sentences[i])
-            for k in range(length_without_puntuation):
-                results.append(sentences[i-1] + '\n' + sentences[i])
-                indexes.append(indexes_of_non_punc[k])
-                main_row.append(1)
-                row_num.append(2)
-        else:
-            length_without_puntuation, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(
-                sentences[i])
-            for k in range(length_without_puntuation):
-                results.append(sentences[i-1] + '\n' + sentences[i] + '\n' + sentences[i+1])
-                indexes.append(indexes_of_non_punc[k])
-                main_row.append(1)
-                row_num.append(3)
+            continue
+
+        # Assemble the context rows: [prev, cur, next], skipping missing
+        # neighbors and chapter-number markers.
+        rows = []                                             # 清空上下文行
+        if i > 0 and sentences[i - 1] not in CHAPTER_MARKS:   # 有前句 且 前句不是章节号
+            rows.append(sentences[i - 1])                     # 才把前句加入
+        highlight_row = len(rows)                             # 当前句所在行号 = 目前已加入的行数
+        rows.append(cur)                                      # 当前句必在
+        if i < n - 1 and sentences[i + 1] not in CHAPTER_MARKS: # 有后句 且 后句不是章节号
+            rows.append(sentences[i + 1])                     # 才把后句加入
+
+        # One frame per non-punctuation character for step-by-step highlighting.
+        frame = '\n'.join(rows)
+        for _, idx in calculate_length_without_punctuation_and_indexes(cur):
+            results.append(frame)
+            indexes.append(idx)
+            main_row.append(highlight_row)
+            row_num.append(len(rows))
     return results, indexes, main_row, row_num
 
 
@@ -338,11 +301,12 @@ if __name__ == '__main__':
         # To be saved for use with PsychoPy
         preface, main_content_parts = split_preface_main_content(result, args.divide_nums)
 
-        preface_text, preface_indexes, preface_main_row, preface_row_num = arrange_sentences_in_psychopy_requirement(
-            preface)
+        preface_text, preface_indexes, preface_main_row, preface_row_num = arrange_sentences_in_psychopy_requirement(preface)
 
         save_to_xlsx(args.save_path, r'/segmented_Chinense_novel_preface_display.xlsx', preface_text,
                      preface_indexes, preface_main_row, preface_row_num)
+
+        exit()
 
         for i, main_content_part in enumerate(main_content_parts):
             text, indexes, main_row, row_num = arrange_sentences_in_psychopy_requirement(main_content_part)
