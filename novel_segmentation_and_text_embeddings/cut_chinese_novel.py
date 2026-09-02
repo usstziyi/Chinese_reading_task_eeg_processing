@@ -136,18 +136,13 @@ def arrange_sentences_within_30_words(sentences):
 
 def split_chapter_title(sentences):
     """Make each chapter title into a separate sentence."""
-    chapter_num = 0
-    for i in range(len(sentences)):
-        if sentences[i].find('Ch' + str(round(chapter_num))) != -1:
-            index = sentences[i].find('Ch' + str(round(chapter_num)))
-            segments = [sentences[i][:(index)], str(round(chapter_num)), sentences[i][(index+len(str(round(chapter_num)))+2):]]
-            sentences[i] = segments[0]
-            sentences.insert(i+1, segments[1])
-            sentences.insert(i+2, segments[2])
-            chapter_num += 1
-    sentences = list(filter(lambda x:x != '', sentences))
-
-    return sentences
+    results = []
+    for s in sentences:
+        # At each ChN marker: cut the text and keep the number as its own
+        # element (re.split with one capture group returns [text, num, text,
+        # num, ...]). Drop the empty pieces around the markers.
+        results.extend(part for part in re.split(r'Ch(\d+)', s) if part)
+    return results
 
 
 def repeat_sentences(sentences):
