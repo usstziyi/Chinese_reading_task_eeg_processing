@@ -5,7 +5,6 @@ import numpy as np
 import torch
 import argparse
 
-os.environ['CURL_CA_BUNDLE'] = ''
 
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 
@@ -16,20 +15,39 @@ tokenizer = BertTokenizer.from_pretrained(
 
 model = AutoModelForMaskedLM.from_pretrained("bert-base-chinese")
 
-parser = argparse.ArgumentParser(description='Parameters that can be changed')
 
-parser.add_argument('--Chinese_novel_path', type=str, default=r'../data/segmented_novel',
-                    help='Path to the folder that contains the .xlsx files of the texts')
-parser.add_argument('--run_num', type=int, default=7,
-                    help='Number of runs of your experiment')
-parser.add_argument('--save_path', type=str, default=r'../data/embeddings',
-                    help='Path to save the embedding files')
+
+Chinese_novels = {
+    "LittlePrince": {
+        'segmented_path':r'../data/segmented_novel_new/LittlePrince', 
+        'run_num':7,
+        'embedding_path':r'../data/embeddings/LittlePrince',
+    },
+    "GarnettDream": {
+        'segmented_path':r'../data/segmented_novel_new/GarnettDream', 
+        'run_num':18,
+        'embedding_path':r'../data/embeddings/GarnettDream',
+    }
+}
+
+
+parser = argparse.ArgumentParser(description='Parameters that can be changed in this experiment')
+parser.add_argument('--novel_name',type=str,default='LittlePrince',
+                    help='Novel key in Chinese_novels (e.g. LittlePrince, GarnettDream)')
 
 args = parser.parse_args()
 
+novel_cfg = Chinese_novels[args.novel_name]
+args.segmented_path = novel_cfg['segmented_path']
+args.run_num = novel_cfg['run_num']
+args.embedding_path = novel_cfg['embedding_path']
 
+os.makedirs(args.embedding_path, exist_ok=True)
+
+
+model.eval()
 for i in range(args.run_num):
-    novel_path = args.Chinese_novel_path + '/segmented_Chinense_novel_run_' + str(i+1) + '.xlsx'
+    novel_path = args.segmented_path + '/segmented_Chinese_novel_run_' + str(i+1) + '.xlsx'
 
     wb = openpyxl.load_workbook(novel_path)
     wsheet = wb.active
@@ -38,13 +56,14 @@ for i in range(args.run_num):
     for j in range(2, wsheet.max_row + 1):
         texts.append((wsheet.cell(row=j, column=1)).value)
 
-    # print(texts)
 
     embeddings = []
     for k in range(len(texts)):
         token = tokenizer.encode(texts[k], return_tensors='pt') # (1，seq_len)
-        embedding = model(token).logits # (1，seq_len，vocab_size)
-        embedding = torch.mean(embedding, dim=1) # (1，vocab_size)
+        with torch.no_grad():
+            # print(texts[k], token)
+            embedding = model(token).logits # (1，seq_len，vocab_size)
+            embedding = torch.mean(embedding, dim=1) # (1，vocab_size)
         embeddings.append(embedding.detach().numpy())
 
 
@@ -53,8 +72,7 @@ for i in range(args.run_num):
     embeddings = embeddings.reshape(embeddings.shape[0], embeddings.shape[2]) # (num_texts, vocab_size)
 
 
-
-    np.save(args.save_path + '/text_embedding_run_' + str(i+1) + '.npy', embeddings)
+    np.save(args.embedding_path + '/text_embedding_run_' + str(i+1) + '.npy', embeddings)
     print(f'Run {i+1} embeddings saved')
 
 
