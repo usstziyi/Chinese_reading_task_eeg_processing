@@ -276,18 +276,30 @@ def save_to_xlsx(file_path, file_name, text, indexes=None, main_row=None, row_nu
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Parameters that can be changed in this experiment')
+
+    Chinese_novels = {
+        "LittlePrince": {
+            'novel_path':r'../data/novel/LittlePrince.txt', 
+            'divide_nums':'4, 8, 12, 16, 20, 24',
+            'save_path':r'../data/segmented_novel_new/LittlePrince',
+        },
+        "GarnettDream": {
+            'novel_path':r'../data/novel/GarnettDream.txt', 
+            'divide_nums':'1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18',
+            'save_path':r'../data/segmented_novel_new/GarnettDream',
+        }
+    }
+
+
     
-    parser.add_argument('--Chinese_novel_path', type=str, default=r'../data/novel/xiaowangzi_main_text.txt', help='Path to your .txt Chinese novel content')
-    parser.add_argument('--divide_nums', type=str, default='4, 8, 12, 16, 20, 24', help='Breakpoints which you want to divide your novel (comma-separated)')
-    parser.add_argument('--save_path', type=str, default=r'../data/segmented_novel_new',
-                        help='Path to save the outputs')
+    parser.add_argument('--novel_name', type=str, default='LittlePrince',
+                        help='Novel key in Chinese_novels (e.g. LittlePrince, GarnettDream)')
     args = parser.parse_args()
 
-    divide_num_list = args.divide_nums.split(',')
-  
-    divide_num_list = [int(num) for num in divide_num_list]
-
-    args.divide_nums = divide_num_list
+    novel_cfg = Chinese_novels[args.novel_name]
+    args.Chinese_novel_path = novel_cfg['novel_path']
+    args.divide_nums = [int(num) for num in novel_cfg['divide_nums'].split(',')]
+    args.save_path = novel_cfg['save_path']
     
 
     with open(args.Chinese_novel_path, encoding='utf-8') as file:
