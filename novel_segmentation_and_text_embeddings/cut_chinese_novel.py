@@ -84,23 +84,12 @@ def cut_sentences(sentences):
         if len(sentences[i]) <= 10:
             results.append(sentences[i])
         else:
-            segments = re.split(r"(，|：)", sentences[i])
-            segments.append("")
-            #print(segments)
-            # Piece together the separate punctuation marks.
-
-            segments = [''.join(i) for i in zip(segments[0::2], segments[1::2])]
-
-            #print(segments)
-            # Move the punctuation to the right place
-            for i in range(len(segments)):
-                if segments[i][0] in ['，', '：']:
-                    segments[i - 1] += segments[i][0]
-                    segments[i] = segments[i][1:]
-            # Remove empty str
-            segments = list(filter(lambda x: x != '', segments))
-            segments = [k.strip() for k in segments]
-            #print(segments)
+            # Split the long sentence at commas/colons; keep each separator with
+            # its preceding segment and merge consecutive separators into the ending.
+            segments = re.findall(r"[^，：]+[，：]*", sentences[i])
+            segments = [s.strip() for s in segments]
+            # Drop empty str
+            segments = [s for s in segments if s]
             segments = merge_short_sentences(segments)
             for j in range(len(segments)):
                 results.append(segments[j])
