@@ -9,6 +9,9 @@ Author: Jianyu Zhang, Xinyu Mou
 This is used for novel segmentation and format transformation for the Chinese novel you want to play.
 '''
 
+# Chapter-number markers ('0'-'40') that must stay as separate frames
+CHAPTER_MARKS = {str(i) for i in range(41)}
+
 def merge_short_sentences(segments):
     """Concatenate overly short, split sentences in a sentence"""
     results = []
@@ -22,24 +25,14 @@ def merge_short_sentences(segments):
 
 def insert_element_to_str(str, element, index):
     """Insert a specified element into a specified position in a string"""
-    str_list = list(str)
-    str_list.insert(index, element)
-    result = ''.join(str_list)
-    return result
+    return str[:index] + element + str[index:]
 
 
 def calculate_length_without_punctuation_and_indexes(sentence):
     """Calculate the length of a sentence excluding punctuation and the coordinates of all non-punctuation positions"""
-    punctuations = ['\n', '。', '，', '！', '？', '：', '；', '“', '”', '、', '《', '》', '.', '（', '）', '…', '·']
-    sentence_list = list(sentence)
-    length_without_punctuation = 0
-    indexes = []
-    for index, char in enumerate(sentence_list):
-        if char not in punctuations:
-            length_without_punctuation += 1
-            indexes.append(index)
-
-    return length_without_punctuation, indexes
+    punctuations = {'\n', '。', '，', '！', '？', '：', '；', '“', '”', '、', '《', '》', '.', '（', '）', '…', '·'}
+    indexes = [index for index, char in enumerate(sentence) if char not in punctuations]
+    return len(indexes), indexes
 
 
 
@@ -100,25 +93,22 @@ def cut_sentences(sentences):
 def arrange_sentences_within_30_words(sentences):
     """Obtain the text for each frame displayed on the screen
     (no more than 30 words per frame)."""
-    results = []
-    results.append(sentences[0])
+    results = [sentences[0]]
 
     # Integrate the short sentences according to the capacity of the screen,
     # assuming that each frame does not exceed 30 words and each line contains
     # a maximum of 10 words
     for i in range(1, len(sentences)):
-        length_wiithout_punctuation_last, _ = calculate_length_without_punctuation_and_indexes(results[-1])
-        length_wiithout_punctuation_new, _ = calculate_length_without_punctuation_and_indexes(sentences[i])
-
-
-        if sentences[i] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
+        # Chapter-number markers always start a new frame
+        if sentences[i] in CHAPTER_MARKS or sentences[i-1] in CHAPTER_MARKS:
             results.append(sentences[i])
-        elif sentences[i-1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
-            results.append(sentences[i])
-        elif length_wiithout_punctuation_last + length_wiithout_punctuation_new < 31:
-            results[-1] += sentences[i]
         else:
-            results.append(sentences[i])
+            length_last, _ = calculate_length_without_punctuation_and_indexes(results[-1])
+            length_new, _ = calculate_length_without_punctuation_and_indexes(sentences[i])
+            if length_last + length_new < 31:
+                results[-1] += sentences[i]
+            else:
+                results.append(sentences[i])
 
    # Insert \n every ten words in each sentence
     for i in range(len(results)):
