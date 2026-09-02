@@ -161,23 +161,18 @@ def repeat_sentences(sentences):
 
 def split_row(sentences):
     """Divide the text according to each line as displayed in PsychoPy."""
-    results = []
-    for i in range(len(sentences)):
-        sentence_list = sentences[i].split('\n')
-        sentence_list = list(filter(lambda x: x != '\n' and x != '', sentence_list))
-        for j in range(len(sentence_list)):
-            results.append(sentence_list[j])
+    # Flatten each sentence into its lines; split('\n') never yields a '\n'
+    # element, so only empty strings need filtering.
+    results = [row for s in sentences for row in s.split('\n') if row]
 
     # Move the punctuation at the beginning of a sentence to the end of the previous sentence.
-    punctuations = ['。', '，', '！', '？', '：', '；', '”', '、', '》', '.', '）', '…', '·']
+    punctuations = {'。', '，', '！', '？', '：', '；', '”', '、', '》', '.', '）', '…', '·'}
     for i in range(len(results)):
         if results[i][0] in punctuations:
-            results[i-1] += results[i][0]
+            results[i - 1] += results[i][0]
             results[i] = results[i][1:]
 
-    results = list(filter(lambda x:x != '', results))
-    #print(results)
-    return results
+    return [x for x in results if x]
 
 
 def split_preface_main_content(sentences, divide_nums):
