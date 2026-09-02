@@ -38,24 +38,24 @@ for i in range(args.run_num):
     for j in range(2, wsheet.max_row + 1):
         texts.append((wsheet.cell(row=j, column=1)).value)
 
-    print(texts)
+    # print(texts)
 
     embeddings = []
     for k in range(len(texts)):
-        token = tokenizer.encode(texts[k], return_tensors='pt')
-        embedding = model(token).logits
-        embedding = torch.mean(embedding, dim=1)
+        token = tokenizer.encode(texts[k], return_tensors='pt') # (1，seq_len)
+        embedding = model(token).logits # (1，seq_len，vocab_size)
+        embedding = torch.mean(embedding, dim=1) # (1，vocab_size)
         embeddings.append(embedding.detach().numpy())
 
 
-    embeddings = np.array(embeddings)
+    embeddings = np.array(embeddings) # (num_texts, 1, vocab_size)
 
-    embeddings = embeddings.reshape(embeddings.shape[0], embeddings.shape[2])
+    embeddings = embeddings.reshape(embeddings.shape[0], embeddings.shape[2]) # (num_texts, vocab_size)
 
-    print(embeddings)
 
 
     np.save(args.save_path + '/text_embedding_run_' + str(i+1) + '.npy', embeddings)
+    print(f'Run {i+1} embeddings saved')
 
 
 
