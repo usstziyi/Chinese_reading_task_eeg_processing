@@ -237,7 +237,8 @@ def arrange_sentences_in_psychopy_requirement(sentences):
 
         # One frame per non-punctuation character for step-by-step highlighting.
         frame = '\n'.join(rows)
-        for _, idx in calculate_length_without_punctuation_and_indexes(cur):
+        _, indexes_of_non_punc = calculate_length_without_punctuation_and_indexes(cur)
+        for idx in indexes_of_non_punc:
             results.append(frame)
             indexes.append(idx)
             main_row.append(highlight_row)
@@ -305,9 +306,7 @@ if __name__ == '__main__':
 
         save_to_xlsx(args.save_path, r'/segmented_Chinense_novel_preface_display.xlsx', preface_text,
                      preface_indexes, preface_main_row, preface_row_num)
-
-        exit()
-
+                     
         for i, main_content_part in enumerate(main_content_parts):
             text, indexes, main_row, row_num = arrange_sentences_in_psychopy_requirement(main_content_part)
             file_name = r'/segmented_Chinense_novel_run_' + str(round(i + 1)) + '_display.xlsx'
