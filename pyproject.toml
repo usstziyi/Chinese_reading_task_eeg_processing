@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.10"
 dependencies = [
     "openpyxl>=3.1.5",
+    "psychopy>=2026.2.3",
     "torch>=2.13.0",
     "transformers>=5.16.1",
 ]
