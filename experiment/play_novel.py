@@ -352,7 +352,7 @@ def play_preface(thisExp, expInfo, win, routineTimer, eci_client=None):
                                          pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0,
                                          color='white', colorSpace='rgb', opacity=None,
                                          languageStyle='LTR',
-                                         depth=0.0);
+                                         depth=0.0)
     continuePrefaceStart = True
     while continuePrefaceStart:
         theseKeys = keyPreface.getKeys(keyList=['space'], waitRelease=False)
@@ -378,7 +378,7 @@ def play_preface(thisExp, expInfo, win, routineTimer, eci_client=None):
         # update component parameters for each repeat
         # Prepare the texts to be shown in this trial and assign the highlighted character
         texts = []
-
+        # first row
         if thisTrialsPlay.row_num == 2 and thisTrialsPlay.main_row == 0:
             rows = thisTrialsPlay.Chinese_text.split('\n')
             rows = list(filter(lambda x: x != '\n' and x != '', rows))
@@ -413,7 +413,7 @@ def play_preface(thisExp, expInfo, win, routineTimer, eci_client=None):
                                            height=0.05)
                 texts.append(wordPlay)
                 pos_x_other_row += 0.06
-
+        # middle rows
         elif thisTrialsPlay.row_num == 2 and thisTrialsPlay.main_row == 1:
             rows = thisTrialsPlay.Chinese_text.split('\n')
             rows = list(filter(lambda x: x != '\n' and x != '', rows))
@@ -449,6 +449,7 @@ def play_preface(thisExp, expInfo, win, routineTimer, eci_client=None):
                 texts.append(wordPlay)
                 pos_x_other_row += 0.06
 
+        # last row
         elif thisTrialsPlay.row_num == 3:
             rows = thisTrialsPlay.Chinese_text.split('\n')
             rows = list(filter(lambda x: x != '\n' and x != '', rows))
@@ -607,7 +608,7 @@ def main_experiment_without_eyetracker(isFirstSession=True):
     # --- Prepare for the psychopy experiment ---
     # Ensure that relative paths start from the same directory as this script
     _thisDir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(_thisDir)
+    os.chdir(_thisDir) # 把工作目录固定到脚本所在文件夹
     # Store info about the experiment session
     psychopyVersion = '2022.2.4'
     expName = 'PlayNovel'  # from the Builder filename that created this script
@@ -677,7 +678,7 @@ def main_experiment_without_eyetracker(isFirstSession=True):
                                   pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0,
                                   color='white', colorSpace='rgb', opacity=None,
                                   languageStyle='LTR',
-                                  depth=0.0);
+                                  depth=0.0)
     key_Welcome = keyboard.Keyboard()
 
     # --- Initialize components for Routine "trial" ---
@@ -688,7 +689,7 @@ def main_experiment_without_eyetracker(isFirstSession=True):
                               pos=(1, 0), height=0.05, wrapWidth=None, ori=0.0,
                               color='white', colorSpace='rgb', opacity=None,
                               languageStyle='LTR',
-                              depth=-1.0);
+                              depth=-1.0)
 
     # --- Initialize components for Routine "GoodbyePage" ---
     textGoodbye = visual.TextStim(win=win, name='textGoodbye',
@@ -697,7 +698,7 @@ def main_experiment_without_eyetracker(isFirstSession=True):
                                   pos=(0, 0), height=0.05, wrapWidth=None, ori=0.0,
                                   color='white', colorSpace='rgb', opacity=None,
                                   languageStyle='LTR',
-                                  depth=0.0);
+                                  depth=0.0)
     key_Goodbye = keyboard.Keyboard()
 
     # Create some handy timers
