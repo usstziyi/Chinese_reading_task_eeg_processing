@@ -120,13 +120,13 @@ def inverse_solution(eeg_path, fname_fwd, inverse_method="dSPM", snr=3.0, hemi="
 
 
 parser = argparse.ArgumentParser(description='Parameters that can be changed in this experiment')
-parser.add_argument('--eeg_path', type=str, default=r'example_eeg.fif')
-parser.add_argument('--fname_fwd', type=str, default=r'example_eeg-fwd.fif')
+parser.add_argument('--eeg_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg.vhdr')
+parser.add_argument('--fname_fwd', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg-fwd.fif')
 parser.add_argument('--inverse_method', type=str, default=r'dSPM')
 parser.add_argument('--snr', type=float, default=3.0)
 parser.add_argument('--hemi', type=str, default=r'lh')
-parser.add_argument('--save_inverse_operator_path', type=str, default=r'example_eeg-inv.fif')
-parser.add_argument('--clim', type=list, default=[2, 3, 5])
+parser.add_argument('--save_inverse_operator_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg-inv.fif')
+parser.add_argument('--clim', type=float, nargs=3, default=[2, 3, 5])
 parser.add_argument('--inverse_operator_loose', type=float, default=0.2)
 parser.add_argument('--inverse_operator_depth', type=float, default=0.8)
 

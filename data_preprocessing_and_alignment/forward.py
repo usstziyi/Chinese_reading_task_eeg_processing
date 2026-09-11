@@ -36,8 +36,8 @@ def forward_solution(eeg_path, save_fwd_path):
 
 
 parser = argparse.ArgumentParser(description='Parameters that can be changed in this experiment')
-parser.add_argument('--eeg_path', type=str, default=r'example_eeg.fif')
-parser.add_argument('--save_fwd_path', type=str, default=r'example_eeg-fwd.fif')
+parser.add_argument('--eeg_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg.vhdr')
+parser.add_argument('--save_fwd_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg-fwd.fif')
 
 args = parser.parse_args()
 
