@@ -58,4 +58,4 @@ data/embeddings/
 
 test.py
 
-sub-*.*
+ChineseEEG/
