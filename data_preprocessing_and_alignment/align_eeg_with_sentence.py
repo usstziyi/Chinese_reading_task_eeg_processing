@@ -78,15 +78,59 @@ def align_eeg_with_sentence(eeg_path, novel_xlsx_path, text_embedding_path, mont
     return cut_eeg_data, texts, text_embeddings
 
 
+def save_alignment(output_path, cut_eeg_data, texts, text_embeddings):
+    '''
+    把对齐结果落盘为一个 .npz 文件。
 
-parser = argparse.ArgumentParser(description='Parameters that can be changed')
-parser.add_argument('--eeg_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg.vhdr')
-parser.add_argument('--novel_xlsx_path', type=str, default=r'segmented_Chinense_novel_run_1.xlsx')
-parser.add_argument('--text_embedding_path', type=str, default=r'LittlePrince_text_embedding_run_1.npy')
+    各 EEG 分段长度不一致，无法直接堆成一个数组，所以用 object 数组保存；
+    读回时需要显式允许 pickle，例如：
+
+        with np.load(output_path, allow_pickle=True) as data:
+            cut_eeg_data = list(data['segments'])
+            texts = list(data['texts'])
+            text_embeddings = data['text_embeddings']
+
+    :param output_path: 输出路径，不以 .npz 结尾时会自动补上
+    :param cut_eeg_data: align_eeg_with_sentence 返回的 EEG 分段列表
+    :param texts: 与分段一一对应的文本列表
+    :param text_embeddings: 与分段一一对应的文本嵌入
+    '''
+    if not output_path.endswith('.npz'):
+        output_path += '.npz'
+
+    # 分段形状不一致，直接用 np.array 会触发广播错误，需先建好 object 数组再逐个填入
+    segments = np.empty(len(cut_eeg_data), dtype=object)
+    segments[:] = cut_eeg_data
+
+    np.savez_compressed(
+        output_path,
+        segments=segments,
+        texts=np.array(texts, dtype=object),
+        text_embeddings=text_embeddings,
+    )
+
+    print(f'alignment saved to {output_path}')
 
 
-args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description='Parameters that can be changed')
+    parser.add_argument('--eeg_path', type=str, default=r'sub-07_ses-LittlePrince_task-reading_run-01_eeg.vhdr')
+    parser.add_argument('--novel_xlsx_path', type=str, default=r'segmented_Chinense_novel_run_1.xlsx')
+    parser.add_argument('--text_embedding_path', type=str, default=r'LittlePrince_text_embedding_run_1.npy')
+    parser.add_argument('--output_path', type=str, default=r'alignment_run_1.npz',
+                        help='path of the .npz file used to save the alignment result')
+
+    args = parser.parse_args()
+
+    cut_eeg_data, texts, text_embeddings = align_eeg_with_sentence(
+        eeg_path=args.eeg_path, novel_xlsx_path=args.novel_xlsx_path,
+        text_embedding_path=args.text_embedding_path)
+
+    save_alignment(args.output_path, cut_eeg_data, texts, text_embeddings)
+
+    print(f'{len(cut_eeg_data)} segments, {len(texts)} texts, '
+          f'{text_embeddings.shape} embeddings')
 
 
-
-cut_eeg_data, texts, text_embeddings = align_eeg_with_sentence(eeg_path=args.eeg_path, novel_xlsx_path=args.novel_xlsx_path, text_embedding_path=args.text_embedding_path)
+if __name__ == '__main__':
+    main()

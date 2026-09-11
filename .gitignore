@@ -59,3 +59,5 @@ data/embeddings/
 test.py
 
 ChineseEEG/
+
+__pycache__/
