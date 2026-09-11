@@ -57,3 +57,5 @@ data/embeddings/
 
 
 test.py
+
+sub-*.*
